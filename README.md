@@ -62,6 +62,16 @@ The server will be available at `http://localhost:3000`.
 
 This project includes continuous integration with **GitHub Actions**, running **lint, build, and test** on every `push` or `pull request`.
 
+## **🏗 Architecture Overview**
+
+![Architecture Overview](./docs/architecture-overview.png)
+
+- **Frontend:** React / Next.js (web interface)
+- **Backend:** NestJS (API + business logic)
+- **Scheduler/Jobs:** BullMQ (automatic data updates)
+- **External APIs:** Brapi (financial data)
+- **Database:** PostgreSQL (storage for quotes and indicators)
+
 ## **License**
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
