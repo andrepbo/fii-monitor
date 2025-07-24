@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { FiiQuoteEntity } from '../fii-quote.entity/fii-quote.entity';
 
 @Entity('fiis')
 export class FiiEntity {
@@ -19,4 +20,7 @@ export class FiiEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   dividendYield: number;
+
+  @OneToMany(() => FiiQuoteEntity, (quote) => quote.fii)
+  quotes: FiiQuoteEntity[];
 }
