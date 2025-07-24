@@ -2,16 +2,16 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { lastValueFrom } from 'rxjs';
+import { FiiService } from 'src/database/fii/fii.service';
 
 @Injectable()
 export class DataIngestionService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly fiiService: FiiService,
+  ) {}
 
-  /**
-   * Fetches real-time quote data for a given ticker from Brapi API.
-   * @param ticker Stock or FII ticker (e.g., PETR4 or HGLG11).
-   */
-  async getQuote(ticker: string): Promise<any> {
+  async fetchAndSaveQuote(ticker: string): Promise<any> {
     const token = process.env.BRAPI_TOKEN;
     const url = `https://brapi.dev/api/quote/${ticker}`;
 
@@ -21,6 +21,18 @@ export class DataIngestionService {
           headers: { Authorization: `Bearer ${token}` },
         }),
       );
+
+      const quote = response.data?.results?.[0];
+      if (quote) {
+        await this.fiiService.upsertFii({
+          ticker: quote.symbol,
+          name: quote.longName || quote.shortName || quote.symbol,
+          sector: quote.sector || 'Unknown',
+          pvp: quote.priceEarnings || 0,
+          dividendYield: quote.earningsPerShare || 0,
+        });
+      }
+
       return response.data;
     } catch (error: any) {
       throw new Error(

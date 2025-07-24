@@ -7,6 +7,6 @@ export class DataIngestionController {
 
   @Get('quote')
   async getQuote(@Query('ticker') ticker: string) {
-    return this.dataIngestionService.getQuote(ticker);
+    return this.dataIngestionService.fetchAndSaveQuote(ticker);
   }
 }
