@@ -3,15 +3,24 @@ import { DataIngestionService } from './data-ingestion.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { FiiService } from '../database/fii/fii.service';
 
 describe('DataIngestionService', () => {
   let service: DataIngestionService;
   let httpService: HttpService;
+  let mockFiiService: Partial<FiiService>;
 
   beforeEach(async () => {
+    mockFiiService = {
+      upsertFii: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       imports: [HttpModule],
-      providers: [DataIngestionService],
+      providers: [
+        DataIngestionService,
+        { provide: FiiService, useValue: mockFiiService },
+      ],
     }).compile();
 
     service = module.get<DataIngestionService>(DataIngestionService);
@@ -29,8 +38,9 @@ describe('DataIngestionService', () => {
 
     jest.spyOn(httpService, 'get').mockReturnValueOnce(of(mockResponse));
 
-    const result = await service.getQuote('PETR4');
+    const result = await service.fetchAndSaveQuote('PETR4');
     expect(result).toEqual(mockResponse.data);
+    expect(mockFiiService.upsertFii).toHaveBeenCalled();
   });
 
   it('should throw error when API fails', async () => {
@@ -38,7 +48,7 @@ describe('DataIngestionService', () => {
       throw new Error('API error');
     });
 
-    await expect(service.getQuote('PETR4')).rejects.toThrow(
+    await expect(service.fetchAndSaveQuote('PETR4')).rejects.toThrow(
       'Failed to fetch data for PETR4',
     );
   });
