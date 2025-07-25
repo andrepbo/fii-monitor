@@ -1,14 +1,19 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { lastValueFrom } from 'rxjs';
+import { FiiQuoteEntity } from 'src/database/entities/fii-quote.entity/fii-quote.entity';
 import { FiiService } from 'src/database/fii/fii.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class DataIngestionService {
   constructor(
     private readonly httpService: HttpService,
     private readonly fiiService: FiiService,
+    @InjectRepository(FiiQuoteEntity)
+    private readonly quoteRepository: Repository<FiiQuoteEntity>,
   ) {}
 
   async fetchAndSaveQuote(ticker: string): Promise<any> {
@@ -24,13 +29,20 @@ export class DataIngestionService {
 
       const quote = response.data?.results?.[0];
       if (quote) {
-        await this.fiiService.upsertFii({
+        const fii = await this.fiiService.upsertFii({
           ticker: quote.symbol,
           name: quote.longName || quote.shortName || quote.symbol,
           sector: quote.sector || 'Unknown',
           pvp: quote.priceEarnings || 0,
           dividendYield: quote.earningsPerShare || 0,
         });
+
+        const newQuote = this.quoteRepository.create({
+          fii,
+          price: quote.regularMarketPrice || 0,
+          dividendYield: quote.dividendYield || 0,
+        });
+        await this.quoteRepository.save(newQuote);
       }
 
       return response.data;

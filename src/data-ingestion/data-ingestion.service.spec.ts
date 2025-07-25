@@ -4,6 +4,8 @@ import { HttpModule, HttpService } from '@nestjs/axios';
 import { of } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { FiiService } from '../database/fii/fii.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { FiiQuoteEntity } from 'src/database/entities/fii-quote.entity/fii-quote.entity';
 
 describe('DataIngestionService', () => {
   let service: DataIngestionService;
@@ -20,6 +22,10 @@ describe('DataIngestionService', () => {
       providers: [
         DataIngestionService,
         { provide: FiiService, useValue: mockFiiService },
+        {
+          provide: getRepositoryToken(FiiQuoteEntity),
+          useValue: { create: jest.fn(), save: jest.fn() },
+        },
       ],
     }).compile();
 
