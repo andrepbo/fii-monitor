@@ -5,6 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataIngestionModule } from './data-ingestion/data-ingestion.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from './database/database.module';
+import { FiiQuoteService } from './fii-quote/fii-quote.service';
+import { FiiQuoteModule } from './fii-quote/fii-quote.module';
 
 @Module({
   imports: [
@@ -25,8 +27,9 @@ import { DatabaseModule } from './database/database.module';
     }),
     DataIngestionModule,
     DatabaseModule,
+    FiiQuoteModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, FiiQuoteService],
 })
 export class AppModule {}
