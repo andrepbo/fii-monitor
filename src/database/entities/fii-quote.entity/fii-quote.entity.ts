@@ -21,6 +21,6 @@ export class FiiQuoteEntity {
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   dividendYield: number;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: 'timestamp' })
   recordedAt: Date;
 }
