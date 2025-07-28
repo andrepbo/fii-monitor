@@ -7,7 +7,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('FII Monitor API')
     .setDescription(
-      'API para monitoramento de Fundos Imobiliários (FIIs), incluindo cotações e indicadores.',
+      'API for monitoring Real Estate Investment Funds (FIIs), including quotes and indicators.',
     )
     .setVersion('1.0')
     .addTag('fiis')
